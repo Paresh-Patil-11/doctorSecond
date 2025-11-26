@@ -8,7 +8,7 @@ import {
   User, 
   Eye, 
   Ear, 
-  Tooth,
+  Smile,
   Stethoscope,
   ChevronRight,
   Phone
@@ -146,7 +146,7 @@ const Services = () => {
       id: 'dentistry',
       title: 'Dentistry',
       description: 'Comprehensive dental care including cosmetic dentistry and oral surgery.',
-      icon: Tooth,
+      icon: Smile,
       features: [
         'Root Canal Treatment',
         'Dental Implants',

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { useAuth } from '../../contexts/AuthContext'
-import { useDoctors } from '../../hooks/useDoctors'
-import { appointmentAPI } from '../../utils/api'
+import { useAuth } from '../contexts/AuthContext'
+import { useDoctors } from '../hooks/useDoctors'
+import { appointmentAPI } from '../utils/api'
 import { format, addDays } from 'date-fns'
 import { 
   Calendar, 
@@ -39,6 +39,7 @@ const BookAppointment = () => {
 
   const watchedDoctor = watch('doctorId')
   const watchedDate = watch('appointmentDate')
+  const watchedTime = watch('appointmentTime')
 
   // Generate available dates (next 30 days, excluding weekends)
   const generateAvailableDates = () => {
@@ -109,22 +110,24 @@ const BookAppointment = () => {
     setIsLoading(true)
     try {
       const appointmentData = {
-        ...data,
         doctorId: data.doctorId,
+        department: data.department,
         appointmentDate: data.appointmentDate,
         appointmentTime: data.appointmentTime,
         consultationType: data.consultationType || 'in-person',
-        fee: selectedDoctor?.consultationFee || 0
+        symptoms: data.symptoms || '',
+        notes: data.notes || ''
       }
 
-      const result = await appointmentAPI.book(appointmentData)
+      const response = await appointmentAPI.book(appointmentData)
       
-      if (result.success) {
+      if (response.data.success) {
         toast.success('Appointment booked successfully!')
         navigate('/dashboard/user')
       }
     } catch (error) {
-      console.error('Booking error:', error)
+      const message = error.response?.data?.message || 'Failed to book appointment'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -198,7 +201,7 @@ const BookAppointment = () => {
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
                   <p className="mt-4 text-gray-600">Loading doctors...</p>
                 </div>
-              ) : (
+              ) : doctors && doctors.length > 0 ? (
                 doctors.map((doctor) => (
                   <div
                     key={doctor._id}
@@ -231,6 +234,10 @@ const BookAppointment = () => {
                     </div>
                   </div>
                 ))
+              ) : (
+                <div className="col-span-2 text-center py-8">
+                  <p className="text-gray-600">No doctors available at the moment</p>
+                </div>
               )}
             </div>
 
@@ -354,6 +361,7 @@ const BookAppointment = () => {
                   type="text"
                   className="input-field"
                   placeholder="Enter your full name"
+                  readOnly
                 />
                 {errors.patientName && (
                   <p className="text-red-600 text-sm mt-1">{errors.patientName.message}</p>
@@ -375,6 +383,7 @@ const BookAppointment = () => {
                   type="email"
                   className="input-field"
                   placeholder="Enter your email"
+                  readOnly
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
@@ -396,6 +405,7 @@ const BookAppointment = () => {
                   type="tel"
                   className="input-field"
                   placeholder="Enter your phone number"
+                  readOnly
                 />
                 {errors.phone && (
                   <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>

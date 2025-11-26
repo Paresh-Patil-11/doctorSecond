@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useDoctors } from '../../hooks/useDoctors'
+import { useDoctors } from '../hooks/useDoctors'
 import { 
   User, 
   Star, 
@@ -96,7 +96,7 @@ const Team = () => {
             </p>
           </div>
 
-          {doctors.length > 0 ? (
+          {doctors && doctors.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {doctors.map((doctor) => (
                 <div key={doctor._id} className="card p-8 text-center group">

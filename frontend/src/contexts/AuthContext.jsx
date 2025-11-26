@@ -2,6 +2,10 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+// Configure axios base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+axios.defaults.baseURL = API_BASE_URL
+
 // Initial state
 const initialState = {
   user: null,
@@ -85,7 +89,8 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (token) {
         try {
-          const response = await axios.get('/api/auth/me')
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          const response = await axios.get('/auth/me')
           dispatch({
             type: AUTH_SUCCESS,
             payload: {
@@ -95,7 +100,9 @@ export const AuthProvider = ({ children }) => {
             },
           })
         } catch (error) {
+          console.error('Auth check failed:', error)
           localStorage.removeItem('token')
+          delete axios.defaults.headers.common['Authorization']
           dispatch({ type: AUTH_FAILURE })
         }
       } else {
@@ -110,12 +117,13 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials, role) => {
     try {
       dispatch({ type: SET_LOADING, payload: true })
-      const response = await axios.post(`/api/auth/login/${role}`, credentials)
+      const response = await axios.post(`/auth/login/${role}`, credentials)
       
       const { token, user, doctor, admin } = response.data
       const userData = user || doctor || admin
       
       localStorage.setItem('token', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       
       dispatch({
         type: AUTH_SUCCESS,
@@ -140,12 +148,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData, role) => {
     try {
       dispatch({ type: SET_LOADING, payload: true })
-      const response = await axios.post(`/api/auth/register/${role}`, userData)
+      
+      // Transform qualification string to array for doctor registration
+      if (role === 'doctor' && typeof userData.qualification === 'string') {
+        userData.qualification = userData.qualification.split(',').map(q => q.trim())
+      }
+      
+      const response = await axios.post(`/auth/register/${role}`, userData)
       
       const { token, user, doctor } = response.data
       const registeredUser = user || doctor
       
       localStorage.setItem('token', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       
       dispatch({
         type: AUTH_SUCCESS,
@@ -169,6 +184,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = () => {
     localStorage.removeItem('token')
+    delete axios.defaults.headers.common['Authorization']
     dispatch({ type: LOGOUT })
     toast.success('Logged out successfully')
   }
