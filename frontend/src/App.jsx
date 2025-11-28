@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
+import ThemeToggle from './components/ThemeToggle'
+import VideoLoader from './components/VideoLoader'
 
 // Public Pages
 import Home from './pages/Home'
@@ -23,6 +25,7 @@ import UserRegister from './pages/auth/UserRegister'
 import DoctorLogin from './pages/auth/DoctorLogin'
 import DoctorRegister from './pages/auth/DoctorRegister'
 import AdminLogin from './pages/auth/AdminLogin'
+import ForgotPassword from './pages/auth/ForgotPassword'
 
 // Appointment
 import BookAppointment from './pages/BookAppointment'
@@ -36,12 +39,32 @@ import AdminDashboard from './pages/dashboard/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Check if user has already seen the loader
+    const hasSeenLoader = sessionStorage.getItem('hasSeenLoader')
+    if (hasSeenLoader) {
+      setIsLoading(false)
+    }
+  }, [])
+
+  const handleLoadComplete = () => {
+    sessionStorage.setItem('hasSeenLoader', 'true')
+    setIsLoading(false)
+  }
+
+  if (isLoading) {
+    return <VideoLoader onLoadComplete={handleLoadComplete} />
+  }
+
   return (
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
             <Navbar />
+            <ThemeToggle />
             <main className="flex-grow">
               <Routes>
                 {/* Public Routes */}
@@ -61,6 +84,7 @@ function App() {
                 <Route path="/login/doctor" element={<DoctorLogin />} />
                 <Route path="/register/doctor" element={<DoctorRegister />} />
                 <Route path="/login/admin" element={<AdminLogin />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 
                 {/* Appointment Route */}
                 <Route path="/book-appointment" element={<BookAppointment />} />
@@ -91,7 +115,7 @@ function App() {
                   }
                 />
                 
-                {/* Catch all route */}
+                {/* Catch all route - redirect to home instead of 404 */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>

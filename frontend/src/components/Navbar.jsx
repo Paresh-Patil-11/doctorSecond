@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useTheme } from '../contexts/ThemeContext'
 import { 
   Menu, 
   X, 
@@ -9,14 +8,11 @@ import {
   Stethoscope, 
   Shield, 
   Calendar,
-  Sun,
-  Moon,
   ChevronDown
 } from 'lucide-react'
 
 const Navbar = () => {
   const { user, role, isAuthenticated, logout } = useAuth()
-  const { isDark, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const location = useLocation()
@@ -58,7 +54,7 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-40 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
@@ -67,7 +63,7 @@ const Navbar = () => {
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Stethoscope className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-800">Shashwati Healthcare</span>
+              <span className="text-xl font-bold text-gray-800 dark:text-white">Shashwati Healthcare</span>
             </Link>
           </div>
 
@@ -75,31 +71,31 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className={`nav-link ${isActiveLink('/') ? 'text-primary' : ''}`}
+              className={`nav-link ${isActiveLink('/') ? 'text-primary dark:text-primary-light' : ''}`}
             >
               Home
             </Link>
             <Link
               to="/about"
-              className={`nav-link ${isActiveLink('/about') ? 'text-primary' : ''}`}
+              className={`nav-link ${isActiveLink('/about') ? 'text-primary dark:text-primary-light' : ''}`}
             >
               About
             </Link>
             <Link
               to="/services"
-              className={`nav-link ${isActiveLink('/services') ? 'text-primary' : ''}`}
+              className={`nav-link ${isActiveLink('/services') ? 'text-primary dark:text-primary-light' : ''}`}
             >
               Services
             </Link>
             <Link
               to="/team"
-              className={`nav-link ${isActiveLink('/team') ? 'text-primary' : ''}`}
+              className={`nav-link ${isActiveLink('/team') ? 'text-primary dark:text-primary-light' : ''}`}
             >
               Team
             </Link>
             <Link
               to="/contact"
-              className={`nav-link ${isActiveLink('/contact') ? 'text-primary' : ''}`}
+              className={`nav-link ${isActiveLink('/contact') ? 'text-primary dark:text-primary-light' : ''}`}
             >
               Contact
             </Link>
@@ -113,32 +109,23 @@ const Navbar = () => {
 
           {/* Right side items */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
             {/* Authenticated User */}
             {isAuthenticated && user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   {getRoleIcon()}
-                  <span className="text-sm font-medium">{user.name}</span>
-                  <ChevronDown className="w-4 h-4" />
+                  <span className="text-sm font-medium dark:text-white">{user.name}</span>
+                  <ChevronDown className="w-4 h-4 dark:text-white" />
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 border border-gray-200 dark:border-gray-700">
                     <Link
                       to={getDashboardLink()}
-                      className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       <Calendar className="w-4 h-4" />
@@ -146,7 +133,7 @@ const Navbar = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Logout
                     </button>
@@ -157,7 +144,7 @@ const Navbar = () => {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login/user"
-                  className="text-gray-700 hover:text-primary font-medium"
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light font-medium"
                 >
                   Login
                 </Link>
@@ -172,58 +159,55 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? (
+                <X className="w-6 h-6 dark:text-white" />
+              ) : (
+                <Menu className="w-6 h-6 dark:text-white" />
+              )}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-col space-y-3">
               <Link
                 to="/"
-                className={`nav-link ${isActiveLink('/') ? 'text-primary' : ''}`}
+                className={`nav-link ${isActiveLink('/') ? 'text-primary dark:text-primary-light' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/about"
-                className={`nav-link ${isActiveLink('/about') ? 'text-primary' : ''}`}
+                className={`nav-link ${isActiveLink('/about') ? 'text-primary dark:text-primary-light' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
               <Link
                 to="/services"
-                className={`nav-link ${isActiveLink('/services') ? 'text-primary' : ''}`}
+                className={`nav-link ${isActiveLink('/services') ? 'text-primary dark:text-primary-light' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Services
               </Link>
               <Link
                 to="/team"
-                className={`nav-link ${isActiveLink('/team') ? 'text-primary' : ''}`}
+                className={`nav-link ${isActiveLink('/team') ? 'text-primary dark:text-primary-light' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Team
               </Link>
               <Link
                 to="/contact"
-                className={`nav-link ${isActiveLink('/contact') ? 'text-primary' : ''}`}
+                className={`nav-link ${isActiveLink('/contact') ? 'text-primary dark:text-primary-light' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
@@ -238,14 +222,14 @@ const Navbar = () => {
 
               {isAuthenticated && user ? (
                 <>
-                  <div className="border-t border-gray-200 pt-3">
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
                     <div className="flex items-center space-x-2 px-2">
                       {getRoleIcon()}
-                      <span className="text-sm font-medium">{user.name}</span>
+                      <span className="text-sm font-medium dark:text-white">{user.name}</span>
                     </div>
                     <Link
                       to={getDashboardLink()}
-                      className="flex items-center space-x-2 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                      className="flex items-center space-x-2 px-2 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Calendar className="w-4 h-4" />
@@ -253,17 +237,17 @@ const Navbar = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-2 py-2 text-sm text-red-600 hover:bg-gray-100 rounded"
+                      className="w-full text-left px-2 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                     >
                       Logout
                     </button>
                   </div>
                 </>
               ) : (
-                <div className="border-t border-gray-200 pt-3 flex flex-col space-y-2">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex flex-col space-y-2">
                   <Link
                     to="/login/user"
-                    className="text-gray-700 hover:text-primary font-medium px-2"
+                    className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light font-medium px-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
